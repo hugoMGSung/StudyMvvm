@@ -53,6 +53,9 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
 
             <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="결과" 
@@ -64,12 +67,18 @@
             <Label Grid.Row="3" Grid.Column="0" Content="이메일 :" VerticalAlignment="Center" HorizontalAlignment="Right" />
             <Label Grid.Row="4" Grid.Column="0" Content="생일 :" VerticalAlignment="Center" HorizontalAlignment="Right" />
             <Label Grid.Row="5" Grid.Column="0" Content="생일여부 :" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <Label Grid.Row="6" Grid.Column="0" Content="성인여부 :" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <Label Grid.Row="7" Grid.Column="0" Content="별자리 :" VerticalAlignment="Center" HorizontalAlignment="Right" />
+            <Label Grid.Row="8" Grid.Column="0" Content="12지 :" VerticalAlignment="Center" HorizontalAlignment="Right" />
 
             <Label Grid.Row="1" Grid.Column="1" Content="{Binding OutLastName}" VerticalAlignment="Center" />
             <Label Grid.Row="2" Grid.Column="1" Content="{Binding OutFirstName}" VerticalAlignment="Center" />
             <Label Grid.Row="3" Grid.Column="1" Content="{Binding OutEmail}" VerticalAlignment="Center" />
             <Label Grid.Row="4" Grid.Column="1" Content="{Binding OutDate}" VerticalAlignment="Center" />
             <Label Grid.Row="5" Grid.Column="1" Content="{Binding OutBirthday}" VerticalAlignment="Center" />
+            <Label Grid.Row="6" Grid.Column="1" Content="{Binding OutAdult}" VerticalAlignment="Center" />
+            <Label Grid.Row="7" Grid.Column="1" Content="{Binding OutZodiac}" VerticalAlignment="Center" />
+            <Label Grid.Row="8" Grid.Column="1" Content="{Binding OutChnZodiac}" VerticalAlignment="Center" />
         </Grid>
         
     </Grid>

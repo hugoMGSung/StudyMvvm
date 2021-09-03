@@ -18,6 +18,40 @@ namespace WpfMvvmApp.ViewModels
         private string outDate;
         private string outBirthday;
 
+        private string outAdult;
+        private string outZodiac; // 별자리
+        private string outChnZodiac;    // 12지
+
+        public string OutAdult
+        {
+            get => outAdult;
+            set
+            {
+                outAdult = value;
+                RaisePropertyChanged("OutAdult");
+            }
+        }
+
+        public string OutZodiac
+        {
+            get => outZodiac;
+            set
+            {
+                outZodiac = value;
+                RaisePropertyChanged("OutZodiac");
+            }
+        }
+
+        public string OutChnZodiac
+        {
+            get => outChnZodiac;
+            set
+            {
+                outChnZodiac = value;
+                RaisePropertyChanged("OutChnZodiac");
+            }
+        }
+
         public string InFirstName
         {
             get => inFirstName;
@@ -115,7 +149,10 @@ namespace WpfMvvmApp.ViewModels
 
         private bool IsClick()
         {
-            return true;  // Validation Check 대단히 쉽고 간결하게
+            return (!string.IsNullOrEmpty(InLastName) && 
+                    !string.IsNullOrEmpty(InFirstName) && 
+                    !string.IsNullOrEmpty(InEmail) && 
+                    !string.IsNullOrEmpty(InDate.ToString())); // ! 입력안하면 버튼클릭 안됨!! 
         }
 
         private void Click()
@@ -130,6 +167,10 @@ namespace WpfMvvmApp.ViewModels
                 OutEmail = person.Email;
                 OutDate = person.Date.ToString("yyyy-MM-dd");
                 OutBirthday = person.IsBirthday.ToString();
+
+                OutAdult = person.IsAdult.ToString();  // 210903 추가
+                OutZodiac = person.Zodiac;
+                OutChnZodiac = person.ChnZodiac;
             }
             catch (Exception ex)
             {
