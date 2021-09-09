@@ -7,7 +7,7 @@ namespace EmployeeMngApp.ViewModels
 {
     public class MainViewModel : Conductor<object>
     {
-        private readonly string connstring = "Data Source=localhost;Initial Catalog=EMS;Integrated Security=True";
+        //private readonly string connstring = "Data Source=localhost;Initial Catalog=EMS;Integrated Security=True";
         private BindableCollection<Employees> employees;
 
         public BindableCollection<Employees> Employees
@@ -28,6 +28,7 @@ namespace EmployeeMngApp.ViewModels
             {
                 id = value;
                 NotifyOfPropertyChange(() => Id);
+                NotifyOfPropertyChange(() => CanDelEmployee);  // 삭제버튼 활성/비활성화
             }
         }
 
@@ -39,6 +40,7 @@ namespace EmployeeMngApp.ViewModels
             {
                 empName = value;
                 NotifyOfPropertyChange(() => EmpName);
+                NotifyOfPropertyChange(() => CanSaveEmployee); // 저장버튼 활성/비활성화
             }
         }
 
@@ -50,6 +52,7 @@ namespace EmployeeMngApp.ViewModels
             {
                 salary = value;
                 NotifyOfPropertyChange(() => Salary);
+                NotifyOfPropertyChange(() => CanSaveEmployee); // 저장버튼 활성/비활성화
             }
         }
 
@@ -61,6 +64,7 @@ namespace EmployeeMngApp.ViewModels
             {
                 deptName = value;
                 NotifyOfPropertyChange(() => DeptName);
+                NotifyOfPropertyChange(() => CanSaveEmployee); // 저장버튼 활성/비활성화
             }
         }
 
@@ -111,16 +115,10 @@ namespace EmployeeMngApp.ViewModels
 
         public void GetEmployees()
         {
-            using (SqlConnection conn = new SqlConnection(connstring))
+            using (SqlConnection conn = new SqlConnection(Commons.CONNSTRING))
             {
                 conn.Open();
-                string selquery = @"SELECT Id
-                                         , EmpName
-                                         , Salary
-                                         , DeptName
-                                         , Destination
-                                      FROM Employees";
-                SqlCommand cmd = new SqlCommand(selquery, conn);
+                SqlCommand cmd = new SqlCommand(Models.Employees.SELECT_QUERY, conn);
                 SqlDataReader reader = cmd.ExecuteReader();
                 Employees = new BindableCollection<Employees>();
 
@@ -139,39 +137,33 @@ namespace EmployeeMngApp.ViewModels
             }
         }
 
+        public bool CanSaveEmployee
+        {
+            get => !string.IsNullOrEmpty(EmpName) && Salary > 0 && !string.IsNullOrEmpty(DeptName);
+        }
+
         public void SaveEmployee()
         {
             int resultRow = 0;  // UPDATE 기본 1, INSERT 기본 1
 
+            // Validation check 
+            /*if (string.IsNullOrEmpty(EmpName) || Salary == 0 || string.IsNullOrEmpty(DeptName))
+            {
+                MessageBox.Show("입력값에 빈값이 있습니다");
+                return;
+            }*/
+
             try
             {
-                using (SqlConnection conn = new SqlConnection(connstring))
+                using (SqlConnection conn = new SqlConnection(Commons.CONNSTRING))
                 {
                     conn.Open();
-                    var upquery = @"UPDATE Employees
-                                       SET EmpName = @empName
-                                         , Salary = @salary
-                                         , DeptName = @deptName
-                                         , Destination = @destination
-                                     WHERE Id = @id";
-
-                    var inquery = @"INSERT INTO Employees
-                                              ( EmpName
-                                              , Salary
-                                              , DeptName
-                                              , Destination)
-                                         VALUES
-                                              ( @empName
-                                              , @salary
-                                              , @deptName
-                                              , @destination)";
-
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = conn;
                     if (Id == 0) // insert
-                        cmd.CommandText = inquery;
+                        cmd.CommandText = Models.Employees.INSERT_QUERY;
                     else // update 
-                        cmd.CommandText = upquery;
+                        cmd.CommandText = Models.Employees.UPDATE_QUERY;
 
                     SqlParameter empNameParam = new SqlParameter("@empName", EmpName);
                     cmd.Parameters.Add(empNameParam);
@@ -182,13 +174,17 @@ namespace EmployeeMngApp.ViewModels
                     SqlParameter destinationParam = new SqlParameter("@destination", Destination);
                     cmd.Parameters.Add(destinationParam);
 
-                    SqlParameter idParam = new SqlParameter("@id", Id);
-                    cmd.Parameters.Add(idParam);
+                    if (Id != 0) // Update일때만 Id 사용 (분기안하면 무조건 에러)
+                    {
+                        SqlParameter idParam = new SqlParameter("@id", Id);
+                        cmd.Parameters.Add(idParam);
+                    }                   
 
                     resultRow = cmd.ExecuteNonQuery();
 
                     if (resultRow > 0)
                     {
+                        MessageBox.Show("저장되었습니다!");
                         GetEmployees();
                     }
                     else
@@ -215,6 +211,47 @@ namespace EmployeeMngApp.ViewModels
             Id = 0;
             Salary = 0;
             EmpName = DeptName = Destination = string.Empty;
+        }
+
+        public bool CanDelEmployee
+        {
+            get => Id != 0;
+        }
+
+        public void DelEmployee()
+        {
+            // 삭제 검증
+            /*if (Id == 0)
+            {
+                MessageBox.Show("삭제할 수 없습니다");
+                return;
+            }*/
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(Commons.CONNSTRING))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(Models.Employees.DELETE_QUERY, conn);
+
+                    SqlParameter idParam = new SqlParameter("@id", Id);
+                    cmd.Parameters.Add(idParam);
+
+                    if (cmd.ExecuteNonQuery() > 0)
+                    {
+                        MessageBox.Show("삭제되었습니다.");
+                        GetEmployees();
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"예외발생 : {ex.Message}");
+            }
+            finally
+            {
+                NewEmployee();
+            }
         }
     }
 }
