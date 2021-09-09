@@ -1,7 +1,7 @@
 ﻿using Caliburn.Micro;
 using EmployeeMngApp.Models;
 using System.Data.SqlClient;
-using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace EmployeeMngApp.ViewModels
 {
@@ -38,7 +38,7 @@ namespace EmployeeMngApp.ViewModels
             set
             {
                 empName = value;
-                NotifyOfPropertyChange(() => empName);
+                NotifyOfPropertyChange(() => EmpName);
             }
         }
 
@@ -82,6 +82,22 @@ namespace EmployeeMngApp.ViewModels
             set
             {
                 selectedEmployee = value;
+
+                if (selectedEmployee != null)
+                {
+                    Id = value.Id;
+                    EmpName = value.EmpName;
+                    Salary = value.Salary;
+                    DeptName = value.DeptName;
+                    Destination = value.Destination;
+
+                    NotifyOfPropertyChange(() => SelectedEmployee);
+                    /*NotifyOfPropertyChange(() => Id);          // "" != null
+                    NotifyOfPropertyChange(() => EmpName);
+                    NotifyOfPropertyChange(() => Salary);
+                    NotifyOfPropertyChange(() => DeptName);
+                    NotifyOfPropertyChange(() => Destination);*/ // 주석을 풀어도 무방
+                }
             }
         }
 
@@ -93,7 +109,7 @@ namespace EmployeeMngApp.ViewModels
             GetEmployees();
         }
 
-        private void GetEmployees()
+        public void GetEmployees()
         {
             using (SqlConnection conn = new SqlConnection(connstring))
             {
@@ -120,8 +136,67 @@ namespace EmployeeMngApp.ViewModels
                     };
                     Employees.Add(empTmp);
                 }
-
             }
+        }
+
+        public void SaveEmployee()
+        {
+            int resultRow = 0;  // UPDATE 기본 1, INSERT 기본 1
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connstring))
+                {
+                    conn.Open();
+                    var upquery = @"UPDATE Employees
+                                       SET EmpName = @empName
+                                         , Salary = @salary
+                                         , DeptName = @deptName
+                                         , Destination = @destination
+                                     WHERE Id = @id";
+                    SqlCommand cmd = new SqlCommand(upquery, conn);
+                    SqlParameter empNameParam = new SqlParameter("@empName", EmpName);
+                    cmd.Parameters.Add(empNameParam);
+                    SqlParameter salaryParam = new SqlParameter("@salary", Salary);
+                    cmd.Parameters.Add(salaryParam);
+                    SqlParameter deptNameParam = new SqlParameter("@deptName", DeptName);
+                    cmd.Parameters.Add(deptNameParam);
+                    SqlParameter destinationParam = new SqlParameter("@destination", Destination);
+                    cmd.Parameters.Add(destinationParam);
+
+                    SqlParameter idParam = new SqlParameter("@id", Id);
+                    cmd.Parameters.Add(idParam);
+
+                    resultRow = cmd.ExecuteNonQuery();
+
+                    if (resultRow > 0)
+                    {
+                        GetEmployees();
+                    }
+                    else
+                    {
+                        MessageBox.Show("데이터 저장 실패!");
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"예외발생 : {ex.Message}");
+                //return;
+            }
+            finally
+            {
+                NewEmployee();
+            }
+        }
+
+
+        // 신규버튼 클릭 | 저장이후 입력컨트롤 비우기
+        public void NewEmployee()
+        {
+            Id = 0;
+            Salary = 0;
+            EmpName = DeptName = Destination = string.Empty;
         }
     }
 }

@@ -29,7 +29,8 @@
 
             <DataGrid x:Name="Employees" Grid.Row="1" Grid.Column="0"
                       Style="{StaticResource MahApps.Styles.DataGrid.Azure}"
-                      AutoGenerateColumns="False" IsReadOnly="True">
+                      AutoGenerateColumns="False" IsReadOnly="True"
+                      SelectedItem="{Binding SelectedEmployee}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="아이디" Binding="{Binding Id}" />
                     <DataGridTextColumn Header="사원명" Binding="{Binding EmpName}" />
@@ -102,9 +103,19 @@
                      mah:TextBoxHelper.ClearTextButton="True"
                      Style="{StaticResource MahApps.Styles.TextBox}"/>
 
-            <Button x:Name="SaveEmployee" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="저장"
-                    Width="120" Height="40" ToolTip="직원 저장하기"
+            <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                        Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="NewEmployee" Content="신규"
+                        Width="90" Height="40" ToolTip="신규직원"
+                        Style="{StaticResource MahApps.Styles.Button}" />
+                <Button x:Name="SaveEmployee" Content="저장"
+                    Width="90" Height="40" ToolTip="직원 저장하기"
                     Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>
+                <Button x:Name="DelEmployee" Content="삭제"
+                        Width="90" Height="40" ToolTip="직원 삭제하기"
+                        Style="{StaticResource MahApps.Styles.Button.Dialogs.AccentHighlight}" />
+            </StackPanel>
+            
         </Grid>
     </Grid>
 </mah:MetroWindow>
