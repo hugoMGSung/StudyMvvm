@@ -154,7 +154,25 @@ namespace EmployeeMngApp.ViewModels
                                          , DeptName = @deptName
                                          , Destination = @destination
                                      WHERE Id = @id";
-                    SqlCommand cmd = new SqlCommand(upquery, conn);
+
+                    var inquery = @"INSERT INTO Employees
+                                              ( EmpName
+                                              , Salary
+                                              , DeptName
+                                              , Destination)
+                                         VALUES
+                                              ( @empName
+                                              , @salary
+                                              , @deptName
+                                              , @destination)";
+
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = conn;
+                    if (Id == 0) // insert
+                        cmd.CommandText = inquery;
+                    else // update 
+                        cmd.CommandText = upquery;
+
                     SqlParameter empNameParam = new SqlParameter("@empName", EmpName);
                     cmd.Parameters.Add(empNameParam);
                     SqlParameter salaryParam = new SqlParameter("@salary", Salary);
